@@ -24,7 +24,10 @@ export class OnAnswerCreated implements EventHandler {
       answer.questionId.toString()
     );
 
-    if (!question) throw new Error("");
+    if (!question)
+      throw new Error(
+        "Cannot send notification for created answer because the question does not exist"
+      );
 
     await this.sendNotification.execute({
       recipientId: question.authorId.toString(),
