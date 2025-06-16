@@ -3,6 +3,7 @@ import { UniqueEntityId } from "@/core/entities/unique-entity-id";
 import { Optional } from "@/core/types/optional";
 import { Slug } from "@/domain/forum/enterprise/entities/value-objects/slug";
 import dayjs from "dayjs";
+import { QuestionBestAnswerChosenEvent } from "../events/question-best-answer-choosen-event";
 import { QuestionAttachmentList } from "./question-attachment-list";
 
 export interface QuestionProps {
@@ -60,6 +61,16 @@ export class Question extends AggregateRoot<QuestionProps> {
     this.touch();
   }
   set bestAnswerId(bestAnswerId: UniqueEntityId | undefined) {
+    if (bestAnswerId === undefined) return;
+    if (
+      this.props.bestAnswerId === undefined || 
+      !this.props.bestAnswerId.equals(bestAnswerId)
+    ) {
+      this.addDomainEvent(
+        new QuestionBestAnswerChosenEvent(this, bestAnswerId)
+      );
+    }
+
     this.props.bestAnswerId = bestAnswerId;
     this.touch();
   }
